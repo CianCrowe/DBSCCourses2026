@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DBSC Course">
@@ -63,13 +63,16 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0;
+    height: 100%;
     background: var(--bg-grouped);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 17px;
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
   }
   body {
+    display: flex; flex-direction: column;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
   .nav {
@@ -92,7 +95,10 @@
     margin-top: 2px;
   }
   .container {
+    flex: 1;
+    overflow-y: auto;
     padding: 16px 16px calc(env(safe-area-inset-bottom) + 24px);
+    -webkit-overflow-scrolling: touch;
   }
   .section-header {
     font-size: 13px;
@@ -1146,16 +1152,15 @@ function ensureMap() {
   leafletMap = L.map("map", {
     center: MAP_CENTER,
     zoom: 13,
-    zoomControl: false,
+    zoomControl: true,
     attributionControl: true,
-    // Lock the view to the course extent — no pan, no zoom.
-    dragging: false,
-    touchZoom: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false
-    // tap: left at default so popups work on touch devices
+    // Map is interactive: pinch-zoom, pan, double-tap zoom all enabled.
+    dragging: true,
+    touchZoom: true,
+    scrollWheelZoom: true,
+    doubleClickZoom: true,
+    boxZoom: true,
+    keyboard: true
   });
   setTileLayer(currentLayerKey);
   leafletOverlay = L.layerGroup().addTo(leafletMap);
