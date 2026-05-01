@@ -533,13 +533,21 @@
   .list { padding: 0; }
   .list-row {
     display: grid;
-    grid-template-columns: 30px 32px 1fr auto;
+    grid-template-columns: 30px 40px 32px 1fr auto;
     gap: 10px;
     align-items: center;
     padding: 12px 14px;
     border-bottom: 0.5px solid var(--separator);
     min-height: 56px;
   }
+  .mark-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    flex-shrink: 0;
+  }
+  .mark-img svg { display: block; }
   .list-row:last-child { border-bottom: none; }
   .list-num {
     width: 26px; height: 26px;
@@ -654,8 +662,7 @@
 <body>
 
 <div class="nav">
-  <div class="nav-title">DBSC Race Courses 2026</div>
-  <div class="nav-sub">Developed by Cian Crowe</div>
+  <div class="nav-title">Dublin Bay Race Course</div>
   <div class="nav-sub" id="nav-sub">DBSC Summer Series 2026</div>
 </div>
 
@@ -1635,6 +1642,150 @@ function renderSummary(legs) {
   document.getElementById("summary").innerHTML = html;
 }
 
+
+function markSVG(markId) {
+  // Colours from DBSC 2025 chart
+  const OR = '#f47920';  // orange
+  const GR = '#4db849';  // green
+  const BK = '#1c1c1e';  // black
+  const YL = '#f5c518';  // yellow
+  const WH = '#efefef';  // white/cream
+  const GY = '#8e8e93';  // grey hull
+
+  const vb = '0 0 40 62';
+  function wrap(s) {
+    return '<svg viewBox="' + vb + '" width="36" height="56" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+  }
+
+  // ── Conical (triangle pointing up) ───────────────────────────────────────
+  function conical(fill) {
+    return wrap(
+      '<polygon points="20,3 36,56 4,56" fill="' + fill + '"/>' +
+      '<rect x="4" y="55" width="32" height="4" rx="2" fill="' + GY + '"/>'
+    );
+  }
+
+  function conicalHalf(topFill, botFill) {
+  return wrap(
+    // Top half with stroke
+    '<polygon points="20,3 28,29.5 12,29.5" fill="' + topFill + '"/>' +
+    '<polygon points="20,3 28,29.5 12,29.5" fill="none" stroke="' + GY + '" stroke-width="1.5"/>' +
+    // Bottom half drawn on top — covers the internal dividing edge of the stroke
+    '<polygon points="12,29.5 28,29.5 36,56 4,56" fill="' + botFill + '"/>' +
+    '<rect x="4" y="55" width="32" height="4" rx="2" fill="' + GY + '"/>'
+  );
+}
+
+  function conicalThird(topFill, midFill, botFill) {
+    return wrap(
+      // Top third — small triangle
+      '<polygon points="20,3 25.3,20.7 14.7,20.7" fill="' + topFill + '"/>' +
+      // Middle third — trapezoid
+      '<polygon points="14.7,20.7 25.3,20.7 30.7,38.3 9.3,38.3" fill="' + midFill + '"/>' +
+      // Bottom third — trapezoid
+      '<polygon points="9.3,38.3 30.7,38.3 36,56 4,56" fill="' + botFill + '"/>' +
+      '<rect x="4" y="55" width="32" height="4" rx="2" fill="' + GY + '"/>'
+    );
+}
+
+  // ── Wide can/cylinder ─────────────────────────────────────────────────────
+  function can(fill) {
+    return wrap(
+      '<rect x="8" y="16" width="24" height="38" fill="' + fill + '" rx="4"/>' +
+      '<ellipse cx="20" cy="56" rx="14" ry="3" fill="' + GY + '"/>'
+    );
+  }
+
+  function buoy5(c1, c2, c3, c4, c5) {
+  // c1 = topmost section (also used for the topmark)
+  // c5 = bottommost section (the large rounded hull)
+  const gy = '#8e8e93';
+
+  return (
+    '<svg viewBox="0 0 40 78" width="36" height="70" xmlns="http://www.w3.org/2000/svg">' +
+
+    // ── drawn back-to-front ─────────────────────────────────────
+
+    // Waterline
+    '<ellipse cx="20" cy="74" rx="11" ry="3" fill="' + gy + '"/>' +
+
+    // Section 5 — large rounded lower hull
+    '<ellipse cx="20" cy="63" rx="14" ry="12" fill="' + c5 + '"/>' +
+
+    // Section 4 — tapers down into the ball
+    '<polygon points="14,44 26,44 24,54 16,54" fill="' + c4 + '"/>' +
+
+    // Section 3 — straight-sided middle band
+    '<rect x="14" y="33" width="12" height="11" fill="' + c3 + '"/>' +
+
+    // Section 2 — widens slightly from section 1
+    '<polygon points="15,23 25,23 26,33 14,33" fill="' + c2 + '"/>' +
+
+    // Section 1 — narrow upper body
+    '<polygon points="16,12 24,12 25,23 15,23" fill="' + c1 + '"/>' +
+
+    // Hexagonal topmark (same colour as section 1)
+    '<polygon points="20,2 23.5,4.8 23.5,9.5 20,12 16.5,9.5 16.5,4.8" fill="' + c1 + '"/>' +
+
+    '</svg>'
+  );
+}
+
+  switch (markId) {
+
+    // ─── CONICAL MARKS ────────────────────────────────────────────────────
+    case 'A': return conical(OR);           // Salthill    – orange
+    case 'B': return conical(GR);           // Saoirse     – green
+    case 'C': return conical(BK);           // Seapoint    – black
+    case 'D': return conical(OR);           // South Bull  – orange
+    case 'H': return conical(YL);           // Harbour     – yellow
+    case 'K': return conical(OR);           // Boyd        – orange
+    case 'L': return conicalThird(BK,YL,BK);// Merrion     – black yellow black
+    case 'M': return conical(YL);           // Middle      – yellow
+    case 'O': return conical(OR);           // Orange O    – orange
+    case 'Q': return conical(BK);           // Island      – black
+    case 'R': return conical(OR);           // Bulloch     – orange
+    case 'T': return conicalHalf(WH,GR);    // Battery     – white green
+    case 'V': return conical(OR);           // Pier        – orange
+    case 'W': return conical(BK);           // Bay         – black
+    case 'X': return conical(YL);           // Turning     – yellow
+    case '2': return conical(BK);           // Black 2     – black
+    case '3': return conical(GR);           // Green 3     – green
+
+    // ─── Buoy 5 BUOYS WITH BALL TOPMARK ───────────────────────────────────
+
+    // E – South Bar:
+    case 'E': return buoy5(YL, BK, BK, BK, YL);
+
+    // F – Bligh:  
+    case 'F': return buoy5(YL, OR, OR, OR, YL);
+
+    // G – New Ross: 
+    case 'G': return buoy5(YL, WH, BK, BK, YL);
+
+    // J – Asgard:  
+    case 'J': return buoy5(YL, BK, BK, BK, YL);
+
+    // N – Molly:  
+    case 'N': return buoy5(YL, BK, YL, BK, YL);
+
+    // P – Poldy:  
+    case 'P': return buoy5(YL, OR, OR, OR, YL);
+    
+    // S – East:  t
+    case 'S': return buoy5(YL, GR, GR, GR, YL);
+
+    // Y - Omega
+    case 'Y': return buoy5(YL,BK,BK,BK,YL);
+
+    // ─── CAN / CYLINDER ───────────────────────────────────────────────────
+    case 'Z': return can(OR);  // Zebra – orange can
+
+    default: return wrap('');
+  }
+}
+
+
 function renderMarkList(legs) {
   const list = document.getElementById("mark-list");
   if (legs.length === 0) {
@@ -1672,9 +1823,12 @@ function renderMarkList(legs) {
          <span class="${tackClass}">${tackLabel}</span>
        </div>`;
 
+    const fromId = leg.from && leg.from.id ? leg.from.id : null;
+    const toSVG = fromId ? markSVG(fromId) : '';
     html += `
       <div class="list-row">
         <span class="list-num ${i===0 ? 'start' : ''}">${i+1}</span>
+        <div class="mark-img">${toSVG}</div>
         <span class="badge ${badgeClass}">${initial}</span>
         <div>
           <div class="list-name">${from.name}</div>
@@ -1702,6 +1856,7 @@ function renderMarkList(legs) {
   html += `
     <div class="list-row">
       <span class="list-num finish">${legs.length+1}</span>
+      <div class="mark-img">${last.id ? markSVG(last.id) : ''}</div>
       <span class="badge ${badgeClass}">${initial}</span>
       <div>
         <div class="list-name">${last.name}</div>
